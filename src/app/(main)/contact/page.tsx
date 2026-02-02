@@ -18,18 +18,17 @@ export default function ContactPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <Mail className="h-6 w-6 text-primary" />
-                <span>support@vitalityinsights.com</span>
+                <span>abc@gmail.com</span>
               </div>
               <div className="flex items-center gap-4">
                 <Phone className="h-6 w-6 text-primary" />
-                <span>+1 (555) 123-4567</span>
+                <span>+91 8778725356</span>
               </div>
               <div className="flex items-start gap-4">
                 <MapPin className="h-6 w-6 text-primary mt-1" />
                 <span>
-                  123 Health Tech Ave<br />
-                  Innovation City, CA 94043<br />
-                  United States
+                  Salem, 636201<br />
+                  Tamil Nadu, India
                 </span>
               </div>
             </div>

@@ -1,6 +1,7 @@
 export type VitalSign = {
   spo2: number;
-  alternateSensorReading: number;
+  heartRate: number;
+  bloodPressure: string;
   bodyTemperature: number;
   timestamp: string;
 };

@@ -28,8 +28,8 @@ const chartConfig = {
     label: "Temp (°C)",
     color: "hsl(var(--destructive))",
   },
-  alternateSensorReading: {
-    label: "Alt Sensor",
+  heartRate: {
+    label: "Heart Rate (bpm)",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
@@ -64,7 +64,7 @@ export function VitalsChart({ historicalData }: VitalsChartProps) {
             fontSize={12}
             domain={['dataMin - 2', 'dataMax + 2']}
           />
-           <YAxis
+          <YAxis
             yAxisId="right"
             orientation="right"
             tickLine={false}
@@ -102,9 +102,9 @@ export function VitalsChart({ historicalData }: VitalsChartProps) {
           />
           <Line
             yAxisId="right"
-            dataKey="alternateSensorReading"
+            dataKey="heartRate"
             type="monotone"
-            stroke={chartConfig.alternateSensorReading.color}
+            stroke={chartConfig.heartRate.color}
             strokeWidth={2}
             dot={true}
           />

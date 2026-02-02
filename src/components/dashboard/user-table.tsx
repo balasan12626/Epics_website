@@ -53,7 +53,8 @@ export function UserTable() {
         const result = await detectAnomaliesAndAlert({
           userId: user.id,
           spo2: user.vitals.spo2,
-          alternateSensorReading: user.vitals.alternateSensorReading,
+          heartRate: user.vitals.heartRate,
+          bloodPressure: user.vitals.bloodPressure,
           bodyTemperature: user.vitals.bodyTemperature,
           historicalData: user.historicalData,
         });
@@ -114,87 +115,103 @@ export function UserTable() {
     }
     return (
       <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <HelpCircle className="h-5 w-5 text-muted-foreground" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Click "Check Vitals" to run anomaly detection.</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <HelpCircle className="h-5 w-5 text-muted-foreground" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Click "Check Vitals" to run anomaly detection.</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   };
 
   return (
     <Card>
       <CardContent className="p-0">
-    <div className="relative w-full overflow-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead className="text-center">SpO2</TableHead>
-            <TableHead className="text-center">Alt. Sensor</TableHead>
-            <TableHead className="text-center">Temp (°C)</TableHead>
-            <TableHead className="text-center">Status</TableHead>
-            <TableHead className="text-center">Anomaly</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow
-              key={user.id}
-              onClick={() => handleRowClick(user.id)}
-              className="cursor-pointer"
-            >
-              <TableCell>
-                <div className="font-medium">{user.name}</div>
-                <div className="text-sm text-muted-foreground">ID: {user.watchId}</div>
-              </TableCell>
-              <TableCell>{user.location}</TableCell>
-              <TableCell className="text-center">{user.vitals.spo2}%</TableCell>
-              <TableCell className="text-center">{user.vitals.alternateSensorReading}</TableCell>
-              <TableCell className="text-center">{user.vitals.bodyTemperature.toFixed(1)}</TableCell>
-              <TableCell className="text-center">
-                <Badge
-                  variant={
-                    user.connectionStatus === "Connected"
-                      ? "default"
-                      : "destructive"
-                  }
-                  className={user.connectionStatus === 'Connected' ? 'bg-green-500/20 text-green-700 dark:bg-green-500/10 dark:text-green-400 border-green-500/30' : 'bg-red-500/20 text-red-700 dark:bg-red-500/10 dark:text-red-400 border-red-500/30'}
+        <div className="relative w-full overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead className="text-center">SpO2</TableHead>
+                <TableHead className="text-center">Heart Rate (bpm)</TableHead>
+                <TableHead className="text-center">BP (mmHg)</TableHead>
+                <TableHead className="text-center">Temp (°C)</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center">Anomaly</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow
+                  key={user.id}
+                  onClick={() => handleRowClick(user.id)}
+                  className="cursor-pointer"
                 >
-                  {user.connectionStatus === "Connected" ? <CheckCircle2 className="mr-1 h-3 w-3" /> : <XCircle className="mr-1 h-3 w-3" />}
-                  {user.connectionStatus}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-center">
-                  <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                    <AnomalyIndicator userId={user.id} userName={user.name} />
-                  </div>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    checkAnomaly(user);
-                  }}
-                  disabled={anomalyStatus[user.id]?.checking}
-                >
-                  Check Vitals
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-    </CardContent>
+                  <TableCell>
+                    <div className="font-medium">{user.name}</div>
+                    <div className="text-sm text-muted-foreground">ID: {user.watchId}</div>
+                  </TableCell>
+                  <TableCell>{user.location}</TableCell>
+                  <TableCell className="text-center font-semibold">
+                    <span className={user.vitals.spo2 < 95 ? "text-destructive" : "text-green-500"}>
+                      {user.vitals.spo2}%
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center font-semibold">
+                    <span className={(user.vitals.heartRate > 100 || user.vitals.heartRate < 60) ? "text-amber-500" : "text-blue-500"}>
+                      {user.vitals.heartRate}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center font-mono">
+                    {user.vitals.bloodPressure}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className={user.vitals.bodyTemperature > 37.5 ? "text-destructive" : ""}>
+                      {user.vitals.bodyTemperature.toFixed(1)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge
+                      variant={
+                        user.connectionStatus === "Connected"
+                          ? "default"
+                          : "destructive"
+                      }
+                      className={user.connectionStatus === 'Connected' ? 'bg-green-500/20 text-green-700 dark:bg-green-500/10 dark:text-green-400 border-green-500/30' : 'bg-red-500/20 text-red-700 dark:bg-red-500/10 dark:text-red-400 border-red-500/30'}
+                    >
+                      {user.connectionStatus === "Connected" ? <CheckCircle2 className="mr-1 h-3 w-3" /> : <XCircle className="mr-1 h-3 w-3" />}
+                      {user.connectionStatus}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                      <AnomalyIndicator userId={user.id} userName={user.name} />
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        checkAnomaly(user);
+                      }}
+                      disabled={anomalyStatus[user.id]?.checking}
+                    >
+                      Check Vitals
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
     </Card>
   );
 }

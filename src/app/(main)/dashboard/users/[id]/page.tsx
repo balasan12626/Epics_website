@@ -15,18 +15,22 @@ import {
   MapPin,
   Clock,
   Wifi,
+  Activity,
+  Stethoscope,
+  Wind,
 } from "lucide-react";
 import { VitalsChart } from "@/components/dashboard/vitals-chart";
 import { Badge } from "@/components/ui/badge";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 
-export default function UserDetailsPage({
+export default async function UserDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const user: User | undefined = users.find((u) => u.id === params.id);
+  const { id } = await params;
+  const user: User | undefined = users.find((u) => u.id === id);
 
   if (!user) {
     notFound();
@@ -40,12 +44,40 @@ export default function UserDetailsPage({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <HeartPulse className="text-primary" />
+                <Wind className="text-primary" />
                 Current SpO2
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-4xl font-bold">{user.vitals.spo2}%</p>
+              <p className="text-sm text-muted-foreground">
+                Last updated: {format(new Date(user.vitals.timestamp), "PPpp")}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <HeartPulse className="text-primary" />
+                Heart Rate
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-4xl font-bold">{user.vitals.heartRate} bpm</p>
+              <p className="text-sm text-muted-foreground">
+                Last updated: {format(new Date(user.vitals.timestamp), "PPpp")}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Stethoscope className="text-primary" />
+                Blood Pressure
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-4xl font-bold">{user.vitals.bloodPressure}</p>
               <p className="text-sm text-muted-foreground">
                 Last updated: {format(new Date(user.vitals.timestamp), "PPpp")}
               </p>
@@ -61,22 +93,6 @@ export default function UserDetailsPage({
             <CardContent>
               <p className="text-4xl font-bold">
                 {user.vitals.bodyTemperature.toFixed(1)}°C
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Last updated: {format(new Date(user.vitals.timestamp), "PPpp")}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Ruler className="text-primary" />
-                Alternate Sensor
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-4xl font-bold">
-                {user.vitals.alternateSensorReading}
               </p>
               <p className="text-sm text-muted-foreground">
                 Last updated: {format(new Date(user.vitals.timestamp), "PPpp")}
@@ -130,7 +146,7 @@ export default function UserDetailsPage({
           <CardHeader>
             <CardTitle>Vitals History (Last 10 Days)</CardTitle>
             <CardDescription>
-              Historical data for SpO2, temperature, and alternate sensor.
+              Historical data for SpO2, Heart Rate, and Temperature.
             </CardDescription>
           </CardHeader>
           <CardContent>
